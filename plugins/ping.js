@@ -3,53 +3,38 @@ const { runtime } = require("../lib"); // Assuming you have a runtime function f
 
 smd(
   {
-    pattern: "ping", 
-    react: "⏳️", 
-    desc: "Check the bot's latency and uptime", 
+    pattern: "ping",
+    desc: "Check the bot's latency",
+    react: "⏳️",
     category: "misc",
     filename: __filename,
   },
   async (m) => {
     try {
+      console.log("Ping command triggered."); // Debugging step
+
+      // Send "Checking ping..." and record the start time
       const start = Date.now();
+      await m.send("Checking ping...");
+      console.log("Checking ping... sent."); // Debugging step
 
       // Calculate latency
       const latency = Date.now() - start;
+      console.log("Latency calculated:", latency); // Debugging step
 
-      // Get the bot's uptime
-      const uptime = runtime(process.uptime());
+      // Reply with "Pong" and latency
+      await m.reply(`Pong! Latency: ${latency}ms`);
+      console.log("Pong message sent."); // Debugging step
 
-      // Enhanced style for the final message
-      const finalMessage = `
-╭━━━〘 *📡 PING STATUS* 〙━━━╮
-
-      🤖 *Pong!*
-
-      📶 *Latency:*  \`\`\`${latency}ms\`\`\`
-      ⏳ *Uptime:*  \`\`\`${uptime}\`\`\`
-      ⚡ *Server Speed:*  🚀 *Optimal*
-
-╰━━━━━━━━━━━━━━━━━━━━━━━╯
-
-╭═•|✿| *𝙉𝙄𝙆𝙆𝘼 𝘽𝙊𝙏𝙕 ⁱⁿᶜ* |✿|•═╮
-      🔰 *reliable bot company by haki* 🔰
-╰════════════════════════╯
-      `;
-
-      // Send the image with the more styled latency and uptime message as a caption
-      await m.send(
-        "https://files.catbox.moe/bh2fpj.jpg", // Replace with your image URL
-        { caption: finalMessage },
-        "img",
-        m
-      );
-
+      // React with a checkmark
+      await m.react("✅️");
+      console.log("Reaction added."); // Debugging step
     } catch (e) {
+      console.error("Error in ping command:", e); // Debugging step
       m.error(`${e}\n\nCommand: ping`, e, false);
     }
   }
 );
-
 
 smd({
    cmdname: "use",
