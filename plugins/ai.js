@@ -273,44 +273,38 @@ smd(
 smd(
   {
     pattern: "gemini",
-    react: "📡",
-    desc: "Get a response from Gemini AI based on user query.",
+    desc: "Ask Gemini AI a question",
+    //react: "🤖",
     category: "ai",
     filename: __filename,
   },
-  async (m) => {
+  async (m, query) => {
     try {
-      // Extract the query from the message
-      const query = m.text.split(' ').slice(1).join(' ');
       if (!query) {
-        return await m.send("Please provide a query, e.g., `.gemini What is the weather today?`.");
+        return await m.reply("Please provide a question or prompt for Gemini AI.");
       }
 
-      // Send a loading message
-      await m.send("..... 🤔");
+      // Send reaction
+      await m.react("⏳️");
 
-      // Define the new API URL
-      const apiUrl = `https://widipe.com/gemini?text=${encodeURIComponent(query)}`;
-      const response = await fetch(apiUrl);
+      // API call
+      const apiKey = "gifted"; // Replace if a different key is required
+      const url = `https://api.giftedtech.my.id/api/ai/geminiaipro?apikey=${apiKey}&q=${encodeURIComponent(query)}`;
+      const response = await axios.get(url);
 
-      if (!response.ok) {
-        return await m.send(
-          `*_Error: ${response.status} ${response.statusText}_*`
-        );
+      // Extract and send the result
+      const result = response.data.result;
+      if (result) {
+        await m.reply(`${result}`);
+      } else {
+        await m.reply("Sorry, I couldn't get a valid response from Gemini AI.");
       }
 
-      // Wait for 2 seconds
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Get the result from the API response
-      const data = await response.json();
-      const resultText = data.result; // Extract the text from the result part
-      const message = `*Response:* \n\n${resultText}`;
-
-      // Send the final response
-      await m.send(message);
+      // Add final reaction
+      await m.react("✅️");
     } catch (e) {
-      await m.error(`${e}\n\ncommand: gemini`, e);
+      console.error("Error in Gemini AI command:", e);
+      await m.reply("An error occurred while processing your request. Please try again.");
     }
   }
 );
