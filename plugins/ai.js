@@ -994,4 +994,43 @@ _${resultText}_
 );
 */
 
+smd(
+  {
+    pattern: "gpt",
+    desc: "Ask  AI a question",
+    //react: "🤖",
+    category: "ai",
+    filename: __filename,
+  },
+  async (m, query) => {
+    try {
+      // If no query provided, check if the message is a reply
+      const input = query || m.quoted?.text;
+      if (!input) {
+        return await m.reply("Please provide a question or prompt for Gemini AI, or reply to a message with the command.");
+      }
 
+      // Send reaction
+      await m.react("⏳️");
+
+      // API call
+      const apiKey = "gifted"; // Replace if a different key is required
+      const url = `https://api.giftedtech.my.id/api/ai/gpt?apikey=${apiKey}&q=${encodeURIComponent(input)}`;
+      const response = await axios.get(url);
+
+      // Extract and send the result
+      const result = response.data.result;
+      if (result) {
+        await m.reply(`${result}`);
+      } else {
+        await m.reply("Sorry, I couldn't get a valid response from Gemini AI.");
+      }
+
+      // Add final reaction
+      await m.react("✅️");
+    } catch (e) {
+      console.error("Error in GPT command:", e);
+      await m.reply("An error occurred while processing your request. Please try again.");
+    }
+  }
+);
